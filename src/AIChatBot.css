@@ -1,0 +1,25 @@
+.input-field {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    width: 30%;
+    height: 36px;
+    margin-right: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .send-button {
+    height: 60px;
+ 
+    border: none;
+    padding: 12px 20px; /* Adjust padding to match input field height */
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: #009933;
+    color: white;
+  }
+  
+  .send-button:hover {
+    background-color: #222; /* Darker grey on hover */
+  }
+  

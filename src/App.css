@@ -36,3 +36,27 @@
     transform: rotate(360deg);
   }
 }
+
+.input-field {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px; /* Add border-radius for rounded corners */
+  width: 140%;
+  height: 36px;
+  margin-right: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.send-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px; /* Add border-radius for rounded corners */
+  cursor: pointer;
+}
+
+.send-button:hover {
+  background-color: #0056b3;
+}
+
