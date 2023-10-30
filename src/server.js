@@ -1,48 +1,64 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const fetch = require('node-fetch');
+const cors = require('cors');
 
 const app = express();
-const port = 3001; // Change this to your desired port number
 
 app.use(express.json());
+app.use(cors());
 
-app.get('/interact-with-virtual-assistant', async (req, res) => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+const API_KEY = "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";
+const OPENAI_ENDPOINT = "https://api.openai.com/v1/chat/completions";
+const ORGANIZATION_ID = "org-KF7EcWtdVCcVZ40bBwgdM4qT";
+
+app.post('/ask', async (req, res) => {
+  const { messages } = req.body;
+
+  const systemMessage = {
+    role: "system",
+    content: "Welcome to the AI ChatBot! Feel free to ask me anything."
+  };
+
+  const apiMessages = messages.map((messageObject) => {
+    const role = messageObject.sender === "ChatGPT" ? "assistant" : "user";
+    return { role, content: messageObject.message };
+  });
+
+  const apiRequestBody = {
+    model: "gpt-3.5-turbo",
+    messages: [
+      systemMessage,
+      ...apiMessages
+    ]
+  };
 
   try {
-    // Navigate to the AGL contact page
-    await page.goto('https://rishi.js.org/omega/');
+    const response = await fetch(OPENAI_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+        "OpenAI-Organization": ORGANIZATION_ID
+      },
+      body: JSON.stringify(apiRequestBody)
+    });
 
-    // Wait for the "Start Chat" button to become available and click it
-    await page.waitForSelector('.chat-button');
-    await page.click('.chat-button');
+    if (!response.ok) {
+      throw new Error("Failed to fetch data from the API.");
+    }
 
-    // Wait for the virtual assistant chat popup to load
-    await page.waitForSelector('.virtual-assistant');
+    const data = await response.json();
 
-    // Interact with the virtual assistant
-    const inputField = await page.$('.virtual-assistant .chat-input');
-    await inputField.type(req.query.message);
+    const chatGptResponse = data.choices[0].message.content;
 
-    const sendButton = await page.$('.virtual-assistant .send-button');
-    await sendButton.click();
-
-    // Wait for the virtual assistant response
-    await page.waitForSelector('.virtual-assistant .chat-response');
-
-    // Capture a screenshot of the virtual assistant interaction
-    await page.screenshot({ path: 'virtual_assistant_interaction.png' });
-
-    res.json({ message: 'Virtual assistant interaction completed.' });
+    res.json({ response: chatGptResponse });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'An error occurred.' });
-  } finally {
-    await browser.close();
+    console.error("Error processing ChatGPT response:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

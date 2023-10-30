@@ -10,7 +10,7 @@ import {
   TypingIndicator
 } from '@chatscope/chat-ui-kit-react';
 
-const API_KEY = "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";
+const API_KEY = "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";
 
 // A message from the system, such as a welcome message
 const systemMessage = {
@@ -61,7 +61,8 @@ function AIChatBot() {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${API_KEY}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "OpenAI-Organization": "org-KF7EcWtdVCcVZ40bBwgdM4qT"
         },
         body: JSON.stringify(apiRequestBody)
       });

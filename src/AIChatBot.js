@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import {
@@ -9,14 +9,6 @@ import {
   MessageInput,
   TypingIndicator
 } from '@chatscope/chat-ui-kit-react';
-
-const API_KEY = "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";
-
-// A message from the system, such as a welcome message
-const systemMessage = {
-  role: "system",
-  content: "Welcome to the AI ChatBot! Feel free to ask me anything."
-};
 
 function AIChatBot() {
   const [messages, setMessages] = useState([
@@ -39,54 +31,35 @@ function AIChatBot() {
 
     setMessages(newMessages);
     setIsTyping(true);
-    await processMessageToChatGPT(newMessages);
-  };
-
-  async function processMessageToChatGPT(chatMessages) {
-    const apiMessages = chatMessages.map((messageObject) => {
-      const role = messageObject.sender === "ChatGPT" ? "assistant" : "user";
-      return { role, content: messageObject.message };
-    });
-
-    const apiRequestBody = {
-      model: "gpt-3.5-turbo",
-      messages: [
-        systemMessage,
-        ...apiMessages
-      ]
-    };
 
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch("http://localhost:5000/ask", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${API_KEY}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(apiRequestBody)
+        body: JSON.stringify({ messages: newMessages })
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch data from the API.");
+        throw new Error("Failed to process message on the server.");
       }
 
       const data = await response.json();
 
-      const chatGptResponse = data.choices[0].message.content;
-
       setMessages([
-        ...chatMessages,
+        ...newMessages,
         {
-          message: chatGptResponse,
+          message: data.response,
           sender: "ChatGPT"
         }
       ]);
     } catch (error) {
-      console.error("Error processing ChatGPT response:", error);
+      console.error("Error processing message on the server:", error);
     } finally {
       setIsTyping(false);
     }
-  }
+  };
 
   return (
     <div className="App">

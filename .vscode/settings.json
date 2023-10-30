@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/6ef42078-5081-46f4-9e32-e33b6b65c327/resourceGroups/Askmeapp_group/providers/Microsoft.Web/sites/Askmeapp",
+    "appService.deploySubpath": "build"
+}
